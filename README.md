@@ -8,6 +8,10 @@ NVIDIA / ASUS tools when it detects that hardware.
 
 Made by **PANKKY**.
 
+<p align="center">
+  <img src="screenshots/export.png" alt="Saving your setup with fedora-setup.sh export" width="800">
+</p>
+
 ## Quick start
 
 ### On your current Fedora: save your setup
@@ -29,6 +33,13 @@ Put `my-setup/` next to the script, then run:
 ```
 
 Reboot when it finishes. That's it.
+
+<details>
+<summary>📸 See what <code>install</code> does (dry run)</summary>
+<p align="center">
+  <img src="screenshots/install.png" alt="Restoring a setup with fedora-setup.sh install --dry-run" width="800">
+</p>
+</details>
 
 ### No saved setup? Just the essentials
 
