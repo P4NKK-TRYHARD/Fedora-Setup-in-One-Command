@@ -9,8 +9,14 @@ NVIDIA / ASUS tools when it detects that hardware.
 Made by **PANKKY**.
 
 <p align="center">
-  <img src="screenshots/desktop.png" alt="My Fedora: GNOME with a macOS-style dock and Blur my Shell (Liquid Glass)" width="900">
-  <br><sub>My Fedora (GNOME, macOS-style dock, Blur my Shell). This is what <code>install</code> brings back.</sub>
+  <img src="screenshots/desktop.png" alt="My Fedora: GNOME with a macOS-style dock" width="900">
+  <br><sub>My Fedora (GNOME, macOS-style theme and dock). This is what <code>install</code> brings back.</sub>
+</p>
+
+<p align="center">
+  <img src="screenshots/files.png" alt="Files app with a macOS-style theme" width="440">
+  &nbsp;
+  <img src="screenshots/blur-my-shell.png" alt="Blur my Shell with the Liquid Glass effect" width="440">
 </p>
 
 <p align="center">
