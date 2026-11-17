@@ -20,7 +20,7 @@
 
 set -uo pipefail
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 ASSUME_YES=0
 DRY_RUN=0
 ACTION=""
@@ -31,7 +31,9 @@ REPOS_DIR="${REPOS_DIR:-/etc/yum.repos.d}"
 FAILED_STEPS=()
 
 # Files and folders from $HOME that are saved by "export" (if they exist).
-# They cover the shell, git and the KDE Plasma / GTK look & feel.
+# They cover the shell, git and the GNOME / KDE Plasma / GTK look & feel.
+# GNOME settings (theme, dock, extensions on/off, shortcuts...) are saved
+# separately with dconf.
 # Nothing with passwords or keys (.ssh, .gnupg, browser profiles...) is saved.
 DOTFILES=(
     .bashrc .bash_profile .zshrc .zprofile .p10k.zsh .gitconfig .vimrc
@@ -49,6 +51,7 @@ DOTFILES=(
     .local/share/plasma .local/share/color-schemes .local/share/aurorae
     .local/share/icons .local/share/fonts .local/share/konsole
     .local/share/wallpapers .local/share/kxmlgui5
+    .local/share/gnome-shell/extensions .local/share/backgrounds
 )
 
 # Packages that are never restored by name (they are handled separately).
@@ -219,6 +222,21 @@ do_export() {
         local size_kb
         size_kb=$(du -k "$dir/dotfiles.tar.gz" | cut -f1)
         (( size_kb > 95000 )) && warn "dotfiles.tar.gz is big (>95 MB): GitHub rejects files over 100 MB. Remove some icon/font folders or keep it outside GitHub."
+    fi
+
+    step "Desktop settings (GNOME: theme, dock, extensions, shortcuts...)"
+    if have dconf; then
+        # Skip noisy/private keys: recent files, window sizes, cached data
+        dconf dump / 2>/dev/null | awk '
+            /^\[/ { skip = ($0 ~ /^\[(org\/gnome\/evolution|org\/gnome\/nautilus\/window-state|org\/gtk\/settings\/file-chooser|org\/gnome\/portal|system\/proxy|org\/gnome\/online-accounts|desktop\/ibus\/panel\/emoji)/) }
+            !skip' >"$dir/dconf.ini"
+        ok "$(grep -c '^\[' "$dir/dconf.ini" || true) settings groups → dconf.ini"
+        if have gnome-extensions; then
+            gnome-extensions list --enabled 2>/dev/null >"$dir/gnome-extensions.txt"
+            ok "$(grep -c . "$dir/gnome-extensions.txt" || true) enabled GNOME extensions → gnome-extensions.txt"
+        fi
+    else
+        warn "dconf not found, skipping."
     fi
 
     if [[ ! -e "$dir/extra.sh" ]]; then
@@ -487,6 +505,34 @@ restore_dotfiles() {
     run tar -xzf "$dir/dotfiles.tar.gz" -C "$HOME" && ok "Settings restored (log out and back in to see them)"
 }
 
+restore_desktop() {
+    local dir="$1"
+    [[ -s "$dir/dconf.ini" ]] || return 0
+    step "Restoring your desktop settings (theme, dock, extensions, shortcuts...)"
+    if [[ -s "$dir/gnome-extensions.txt" ]]; then
+        run sudo dnf install -y --skip-unavailable gnome-extensions-app gnome-tweaks
+    fi
+    have dconf || run sudo dnf install -y dconf
+    if (( DRY_RUN )); then
+        echo "    [dry-run] dconf load / < $dir/dconf.ini"
+    else
+        dconf dump / >"$HOME/fedora-setup-dconf-before.ini" 2>/dev/null
+        if dconf load / <"$dir/dconf.ini" 2>>"$LOG_FILE"; then
+            ok "Desktop settings restored (previous ones saved in ~/fedora-setup-dconf-before.ini)"
+        else
+            FAILED_STEPS+=("dconf load")
+            warn "Couldn't load dconf.ini — see $LOG_FILE"
+        fi
+    fi
+    if [[ -s "$dir/gnome-extensions.txt" ]] && have gnome-extensions; then
+        local ext
+        while read -r ext; do
+            [[ -n "$ext" ]] && run gnome-extensions enable "$ext"
+        done <"$dir/gnome-extensions.txt"
+        ok "GNOME extensions enabled (log out and back in if some don't show up yet)"
+    fi
+}
+
 run_extra() {
     local dir="$1"
     [[ -f "$dir/extra.sh" ]] || return 0
@@ -513,6 +559,7 @@ do_install() {
     restore_vscode "$dir"
     restore_shell "$dir"
     restore_dotfiles "$dir"
+    restore_desktop "$dir"
     run_extra "$dir"
 }
 

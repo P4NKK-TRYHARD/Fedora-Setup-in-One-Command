@@ -1,12 +1,17 @@
 # Fedora Setup in One Command ⚡
 
 Save how your Fedora is set up, and get it back on a fresh install with **one command**:
-your apps, repositories, Flatpaks, Snaps, VS Code extensions, shell, KDE/GTK theme, fonts and icons.
+your apps, repositories, Flatpaks, Snaps, VS Code extensions, shell, GNOME or KDE theme, extensions, fonts and icons.
 
 It also installs what every fresh Fedora needs: RPM Fusion, multimedia codecs, Flathub, and
 NVIDIA / ASUS tools when it detects that hardware.
 
 Made by **PANKKY**.
+
+<p align="center">
+  <img src="screenshots/desktop.png" alt="My Fedora: GNOME with a macOS-style dock and Blur my Shell (Liquid Glass)" width="900">
+  <br><sub>My Fedora (GNOME, macOS-style dock, Blur my Shell). This is what <code>install</code> brings back.</sub>
+</p>
 
 <p align="center">
   <img src="screenshots/export.png" alt="Saving your setup with fedora-setup.sh export" width="800">
@@ -63,7 +68,8 @@ Reboot when it finishes. That's it.
 | Your Flatpak and Snap apps | | ✅ |
 | Your VS Code extensions | | ✅ |
 | Your shell (zsh + Oh My Zsh) | | ✅ |
-| Your settings: KDE/GTK theme, icons, fonts, Konsole, git… | | ✅ |
+| Your settings: GTK/KDE theme, icons, fonts, terminal, git… | | ✅ |
+| Your GNOME desktop: dock, extensions, shortcuts, wallpaper (dconf) | | ✅ |
 | Your own commands from `extra.sh` | | ✅ |
 
 ## What's inside `my-setup/`
@@ -75,6 +81,7 @@ Reboot when it finishes. That's it.
 | `flatpaks.txt`, `snaps.txt` | Your apps |
 | `vscode-extensions.txt` | Your VS Code extensions |
 | `dotfiles.tar.gz` | Your settings (theme, fonts, icons, shell, git…) |
+| `dconf.ini`, `gnome-extensions.txt` | Your GNOME settings and enabled extensions |
 | `extra.sh` | Your own commands, run at the end |
 
 It **never** saves passwords or keys (`.ssh`, `.gnupg`, browser profiles…). Even so, check

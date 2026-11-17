@@ -1,3 +1,7 @@
 # Your personal setup: keep it out of the public repository
 my-setup/
 *.log
+
+# Never upload raw screenshots by accident (only the curated ones)
+screenshots/Captura*
+screenshots/Screenshot*
